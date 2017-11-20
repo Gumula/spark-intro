@@ -9,7 +9,7 @@ import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.Matchers._
 
-class SparkTest extends FunSuite  with BeforeAndAfter {
+class SparkTest extends FunSuite with BeforeAndAfter {
   val spark: SparkSession = createSession
 
   private def createSession = {
@@ -31,12 +31,12 @@ class SparkTest extends FunSuite  with BeforeAndAfter {
 }
 
 object Util {
-    val dateTimeFormat: DateTimeFormatter = new DateTimeFormatterBuilder()
-      .appendPattern("EEE MMM d HH:mm:ss ")
-      .appendOffset("+HHMM", "+0000")
-      .appendLiteral(" ")
-      .appendText(ChronoField.YEAR)
-      .toFormatter
+  val dateTimeFormat: DateTimeFormatter = new DateTimeFormatterBuilder()
+    .appendPattern("EEE MMM d HH:mm:ss ")
+    .appendOffset("+HHMM", "+0000")
+    .appendLiteral(" ")
+    .appendText(ChronoField.YEAR)
+    .toFormatter
 
   def toWordsList(text: String): Array[String] = {
     text.replaceAll("\\<[^>]*>", "")
@@ -50,4 +50,8 @@ object Util {
       .filter(str => str.length > 2)
       .filter(str => !Stopwords.stopwords.contains(str.toLowerCase))
   }
+
+  def extractDevice(source: String): String = {
+    ">(.+?)<".r.findFirstIn(source).getOrElse("").replaceAll("<", "").replaceAll(">", "")
   }
+}

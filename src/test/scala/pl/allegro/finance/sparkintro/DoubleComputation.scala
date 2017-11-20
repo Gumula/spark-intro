@@ -3,6 +3,7 @@ import org.scalatest.Matchers._
 
 class DoubleComputation extends SparkTest {
 
+  //hint: numbers should be mapped only once
   test("should run computation once") {
     import spark.implicits._
 

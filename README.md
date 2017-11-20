@@ -1,2 +1,2 @@
-# spark-intro
-Examples of Apache spark use cases
+#Spark intro
+Examples of Apache Spark use cases

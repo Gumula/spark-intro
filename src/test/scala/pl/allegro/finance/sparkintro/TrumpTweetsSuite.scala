@@ -11,7 +11,7 @@ class TrumpTweetsSuite extends SparkTest {
   import spark.implicits._
   import org.apache.spark.sql.functions._
 
-  private val tweets = spark.read.json("/Users/przemyslaw.gumula/Downloads/trump.json").as[Tweet].cache()
+  private val tweets = spark.read.json("src/main/resources/trump.json").as[Tweet].cache()
 
   test("should get the id, created_at, retweet_count, text of the 5 most retweeted tweets") {
     val mostRetweeted = tweets

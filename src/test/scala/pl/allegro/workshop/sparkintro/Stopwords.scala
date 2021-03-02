@@ -1,4 +1,4 @@
-package pl.allegro.finance.sparkintro
+package pl.allegro.workshop.sparkintro
 
 object Stopwords {
   val stopwords: Array[String] = Array(

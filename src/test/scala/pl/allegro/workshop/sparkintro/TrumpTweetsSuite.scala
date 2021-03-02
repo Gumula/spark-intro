@@ -1,8 +1,10 @@
-package pl.allegro.finance.sparkintro
+package pl.allegro.workshop.sparkintro
+
+import java.time.{YearMonth, ZonedDateTime}
 
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.expressions.scalalang.typed
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 
 class TrumpTweetsSuite extends SparkTest {
 
@@ -11,11 +13,11 @@ class TrumpTweetsSuite extends SparkTest {
 
   private val tweets = spark.read.json("src/main/resources/trump.json").as[Tweet].cache()
 
-  //hint: sort and map
-  //you can access the column like this: $"retweet_count"
   test("should get the id, created_at, retweet_count, text of the 5 most retweeted tweets") {
-
-    val mostRetweeted: Array[(Long, String, Long, String)] = ???
+    val mostRetweeted = tweets
+      .sort($"retweet_count".desc)
+      .map(tweet => (tweet.id, tweet.created_at, tweet.retweet_count, tweet.text))
+      .take(5)
 
     mostRetweeted should contain theSameElementsInOrderAs List(
       (795954831718498305L, "Tue Nov 08 11:43:14 +0000 2016", 348986L, "TODAY WE MAKE AMERICA GREAT AGAIN!"),
@@ -27,11 +29,12 @@ class TrumpTweetsSuite extends SparkTest {
 
   }
 
-  //hint: use created_at field of Tweet
-  //parse the date using Util.dateTimeFormat
   test("should count tweets by month") {
 
-    val grouped: Dataset[(String, Long)] = ???
+    val grouped = tweets
+      .groupByKey(tweet =>
+        YearMonth.from(ZonedDateTime.parse(tweet.created_at, Util.dateTimeFormat)).toString)
+      .count()
 
     grouped.collect() should contain allOf(
       ("2016-02", 44L),
@@ -49,36 +52,6 @@ class TrumpTweetsSuite extends SparkTest {
     )
   }
 
-  //hint: first group tweets by source
-  //then count how many tweets there are per device
-  //then find all tweets that contain the word 'crooked' (flatMapValues can help)
-  //then count them (typed.sum can help)
-  //then join the 2 datasets
-  //key for 1st table can be accessed by $"_1.value", similarly for second table
-  //then compute the ratio by dividing featured words count by total device count and multiplying the result by 100 to get percent values
-  //extract device name with Util.extractDeviceName(source)
-  // sort by second column $"_2" desc
-  test("should compute ratio of 'crooked' word per device sorted desc") {
-    val grouped = ???
-
-    val counts = ???
-
-    val crookedRatio: Dataset[(String, Double)] = ???
-
-
-    crookedRatio.collect() should contain theSameElementsInOrderAs List(
-      ("Twitter for Android", 12.114537444933921),
-      ("Twitter for iPad", 9.090909090909092),
-      ("Twitter Web Client", 7.971014492753623),
-      ("Twitter for iPhone", 5.384615384615385),
-      ("Media Studio", 0.0),
-      ("Instagram", 0.0),
-      ("Periscope", 0.0),
-      ("Twitter Ads", 0.0)
-    )
-
-  }
-//hint: implement mostPopular
   test("should get most popular words from android and iphone") {
     val android = tweets.filter(tweet => tweet.source == "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>")
     val iphone = tweets.filter(tweet => tweet.source == "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>")
@@ -89,17 +62,16 @@ class TrumpTweetsSuite extends SparkTest {
     println(s"iPhone: ${mostPopularIphone.mkString("\n")}")
     println(s"\nAndroid: ${mostPopularAndroid.mkString("\n")}")
 
-    mostPopularAndroid.head should equal(("hillary",241))
-    mostPopularIphone.head should equal(("thank",402))
+    mostPopularAndroid(0) should equal(("hillary", 241))
+    mostPopularIphone(0) should equal(("thank", 402))
   }
 
-  //hint: extract words list from text with Util.toWordsList
-  // flatMap will be useful
-  // group and aggregate
-  // count the words with typed.count[String]
-  //you should rename the aggregated column to make it sortable
   def mostPopular(dataset: Dataset[Tweet]): Dataset[(String, Long)] = {
-    ???
+    dataset
+      .flatMap(tweet => Util.toWordsList(tweet.text))
+      .groupByKey(str => str)
+      .agg(typed.count[String](str => str).name("counts"))
+      .sort(col("counts").desc)
   }
 
 }

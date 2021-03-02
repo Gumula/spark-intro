@@ -1,15 +1,19 @@
-name := "spark-intro"
 
-version := "0.1"
+ThisBuild / scalaVersion     := "2.12.12"
+ThisBuild / version          := "0.1.0-SNAPSHOT"
+ThisBuild / organization     := "pl.allegro.workshop.sparkintro"
+ThisBuild / organizationName := "allegro"
 
-scalaVersion := "2.11.11"
+val sparkVersion = "3.1.0"
 
-val sparkVersion = "2.2.0"
+lazy val root = (project in file("."))
+  .settings(
+    name := "spark-intro",
+    libraryDependencies ++= Seq(
+      "org.apache.spark" %% "spark-core" % sparkVersion,
+      "org.apache.spark" %% "spark-sql" % sparkVersion,
+      "com.typesafe" % "config" % "1.4.1",
 
-libraryDependencies ++= Seq(
-  "org.apache.spark" % "spark-core_2.11" % sparkVersion,// % "provided",
-  "org.apache.spark" % "spark-sql_2.11" % sparkVersion,// % "provided",
-  "com.typesafe" % "config" % "1.3.1",
-
-  "org.scalatest" % "scalatest_2.11" % "3.0.4" % "test"
-)
+      "org.scalatest" %% "scalatest" % "3.2.3" % "test"
+    )
+  )

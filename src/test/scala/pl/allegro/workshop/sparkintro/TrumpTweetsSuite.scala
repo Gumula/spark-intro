@@ -1,10 +1,10 @@
-package pl.allegro.finance.sparkintro
+package pl.allegro.workshop.sparkintro
 
 import java.time.{YearMonth, ZonedDateTime}
 
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.expressions.scalalang.typed
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 
 class TrumpTweetsSuite extends SparkTest {
 
@@ -52,35 +52,6 @@ class TrumpTweetsSuite extends SparkTest {
     )
   }
 
-  test("should compute ratio of 'crooked' word per device sorted desc") {
-    val grouped = tweets
-      .groupByKey(_.source)
-
-    val counts = grouped
-      .count()
-
-    val crookedRatio: Dataset[(String, Double)] = grouped
-      .mapValues(tweet => if (tweet.text.toLowerCase.contains("crooked")) 1 else 0)
-      .agg(typed.sum(f => f))
-      .joinWith(counts, $"_1.value".equalTo($"_2.value"))
-      .map { case (featured, general) => (general._1, featured._2 * 100 / general._2.toDouble) }
-      .map { case (source, ratio) => (">(.+?)<".r.findFirstIn(source).getOrElse("").replaceAll("<", "").replaceAll(">", ""), ratio) }
-      .sort($"_2".desc)
-
-
-    crookedRatio.collect() should contain theSameElementsInOrderAs List(
-      ("Twitter for Android", 12.114537444933921),
-      ("Twitter for iPad", 9.090909090909092),
-      ("Twitter Web Client", 7.971014492753623),
-      ("Twitter for iPhone", 5.384615384615385),
-      ("Media Studio", 0.0),
-      ("Instagram", 0.0),
-      ("Periscope", 0.0),
-      ("Twitter Ads", 0.0)
-    )
-
-  }
-
   test("should get most popular words from android and iphone") {
     val android = tweets.filter(tweet => tweet.source == "<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>")
     val iphone = tweets.filter(tweet => tweet.source == "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>")
@@ -91,8 +62,8 @@ class TrumpTweetsSuite extends SparkTest {
     println(s"iPhone: ${mostPopularIphone.mkString("\n")}")
     println(s"\nAndroid: ${mostPopularAndroid.mkString("\n")}")
 
-    mostPopularAndroid(0) should equal(("hillary",241))
-    mostPopularIphone(0) should equal(("thank",402))
+    mostPopularAndroid(0) should equal(("hillary", 241))
+    mostPopularIphone(0) should equal(("thank", 402))
   }
 
   def mostPopular(dataset: Dataset[Tweet]): Dataset[(String, Long)] = {

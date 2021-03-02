@@ -1,18 +1,18 @@
-package pl.allegro.finance.sparkintro
+package pl.allegro.workshop.sparkintro
 
 case class UserMention(
-                         id: Long,
-                         id_str: String,
-                         name: String,
-                         indices: List[Long],
-                         screen_name: String
-                       )
+                        id: Long,
+                        id_str: String,
+                        name: String,
+                        indices: List[Long],
+                        screen_name: String
+                      )
 
 case class Entity(
                    hashtags: List[Hashtag],
                    user_mentions: List[UserMention],
                    urls: List[Url]
-                   )
+                 )
 
 case class User(
                  id: Long,
@@ -34,7 +34,7 @@ case class RetweetedStatus(
                             in_reply_to_user_id: String,
                             possibly_sensitive: Option[Boolean],
                             contributors: String,
-                            place: String,
+                            //place: String,
                             in_reply_to_status_id_str: String,
                             retweeted: Boolean,
                             lang: String,
@@ -56,12 +56,12 @@ case class Tweet(
                   truncated: Boolean,
                   created_at: String,
                   user: User,
-                  geo: String,
+                  geo: Geo,
                   in_reply_to_user_id_str: String,
-                  coordinates: String,
+                  coordinates: Geo,
                   in_reply_to_user_id: String,
                   contributors: String,
-                  place: String,
+                  //place: String,
                   in_reply_to_status_id_str: String,
                   retweeted: Boolean,
                   lang: String,
@@ -74,14 +74,19 @@ case class Tweet(
                 )
 
 case class Hashtag(
-                     indices: List[Long],
-                     text: String
-                   )
+                    indices: List[Long],
+                    text: String
+                  )
 
 case class Url(
-                 indices: List[Long],
-                 display_url: String,
-                 expanded_url: String,
-                 url: String
-               )
+                indices: List[Long],
+                display_url: String,
+                expanded_url: String,
+                url: String
+              )
+
+case class Geo(
+             coordinates: Array[Double],
+             `type`: String
+             )
 
